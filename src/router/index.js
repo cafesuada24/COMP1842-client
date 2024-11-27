@@ -1,14 +1,19 @@
 import { createMemoryHistory, createRouter } from 'vue-router';
-import { useStore } from "vuex";
+//import { useStore } from "vuex";
 import Dashboard from "@/features/dashboard/Dashboard.vue";
+import Income from "@/features/income/Income.vue";
 import AuthLogin from "@/features/auth/AuthLogin.vue";
 
 const routes = [
-  { path: "/", redirect: "/dashboard" },
+  //{ path: "/", redirect: "/dashboard" },
   {
-    path: "/dashboard",
+    path: "/",
     component: Dashboard,
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/income',
+    component: Income,
   },
   { path: "/auth/login", component: AuthLogin, meta: { requiresGuest: true } },
 ];
@@ -18,16 +23,16 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, _, next) => {
-  const store = useStore();
-
-  if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
-    next("/auth/login");
-  } else if (to.meta.requiresGuest && store.getters.isAuthenticated) {
-    next("/dashboard");
-  } else {
-    next(); // Proceed to route
-  }
-});
+//router.beforeEach((to, _, next) => {
+//  const store = useStore();
+//
+//  if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
+//    next("/auth/login");
+//  //} else if (to.meta.requiresGuest && store.getters.isAuthenticated) {
+//  //  next("/dashboard");
+//  } else {
+//    next(to.path); // Proceed to route
+//  }
+//});
 
 export default router;

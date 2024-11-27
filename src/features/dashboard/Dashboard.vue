@@ -10,12 +10,12 @@
             </div>
 
             <nav class="px-4 py-2">
-                <div v-for="(item, index) in menuItems" :key="index"
+                <button v-for="(item, index) in menuItems" :key="index"
                     class="mb-1 flex items-center gap-3 rounded-lg px-4 py-2.5 text-gray-600 hover:bg-gray-100"
-                    :class="{ 'bg-gray-100': item.active }">
+                    :class="{ 'bg-gray-100': item.active }" @click="handleRedirect(item)">
                     <component :is="item.icon" class="h-5 w-5" />
                     <span>{{ item.name }}</span>
-                </div>
+                </button>
             </nav>
         </aside>
 
@@ -37,7 +37,7 @@
                         <MessageCircleIcon class="h-6 w-6 text-gray-600" />
                         <span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"></span>
                     </button>
-                    <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-10 w-10 rounded-full" />
+                    <!-- <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-10 w-10 rounded-full" /> -->
                 </div>
             </header>
 
@@ -113,15 +113,38 @@
 </template>
 
 <script setup>
+import {
+    ActivityIcon,
+    // HomeIcon, 
+    // LayersIcon, 
+    // BoxIcon,
+    // PuzzleIcon,
+    // FileTextIcon,
+    // ChartBarIcon,
+    SearchIcon,
+    BellIcon,
+    MessageCircleIcon
+} from 'lucide-vue-next';
+
+
 const menuItems = [
-    { name: 'Dashboard', active: true }
+    { name: 'Dashboard', active: true },
+    {
+        name: 'Income', url: '/income'
+    }
 ];
+
 </script>
 
 <script>
+
+
 export default {
     // eslint-disable-next-line
     name: "Dashboard",
+    setup() {
+
+    },
     data() {
         return {
             dashboardData: {
@@ -187,6 +210,12 @@ export default {
                 console.error("Error fetching dashboard data:", error);
             }
         },
+        handleRedirect(item) {
+            console.log(item.url);
+            if (item.url) {
+                this.$router.push(item.url);
+            }
+        }
     },
     created() {
         this.fetchDashboardData();
