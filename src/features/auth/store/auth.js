@@ -26,9 +26,7 @@ export default createStore({
       // Call the login API, and commit token and userId on success
       try {
         const response = await axios.post("/api/auth/login", credentials);
-        const { token } = response.data;
-        const profile = await axios.get("/profile");
-        const userId = profile.data._id;
+        const { token, userId } = response.data;
 
         commit("setUser", { token, userId });
       } catch (error) {

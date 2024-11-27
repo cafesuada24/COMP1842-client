@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from './router/index.js'
 import LoginStore from '@/features/auth/store/auth.js';
 import axios from '@/axios/axios.js';
+import './index.css'
 
 // Attach Axios globally
 
