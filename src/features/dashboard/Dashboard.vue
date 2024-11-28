@@ -191,8 +191,8 @@ export default {
             }
         }
     },
-    created() {
-        this.fetchDashboardData();
+    async created() {
+        await this.fetchDashboardData();
     },
 };
 </script>
