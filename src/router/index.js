@@ -8,14 +8,21 @@ const routes = [
   //{ path: "/", redirect: "/dashboard" },
   {
     path: "/",
+    name: "Dashboard",
     component: Dashboard,
     meta: { requiresAuth: true },
   },
   {
     path: '/income',
+    name: "Income",
     component: Income,
+    meta: { requiresAuth: true },
   },
-  { path: "/auth/login", component: AuthLogin, meta: { requiresGuest: true } },
+  {
+    path: "/auth/login",
+    component: AuthLogin,
+    meta: { requiresGuest: true }
+  },
 ];
 
 const router = createRouter({

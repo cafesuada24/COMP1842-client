@@ -25,7 +25,7 @@ export default {
     const handleLogin = async () => {
       try {
         await store.dispatch("login", { email: email.value, password: password.value });
-        router.push("/dashboard"); // Redirect to dashboard after login
+        router.push("/"); // Redirect to dashboard after login
       } catch (error) {
         console.error("Login failed:", error);
       }

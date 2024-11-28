@@ -1,6 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gray-50">
-        <!-- Sidebar -->
+     <!-- <div class="min-h-screen bg-gray-50">
         <aside class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg">
             <div class="p-6">
                 <div class="flex items-center gap-2 text-xl font-semibold text-indigo-600">
@@ -17,12 +16,12 @@
                     <span>{{ item.name }}</span>
                 </button>
             </nav>
-        </aside>
+        </aside> -->
 
         <!-- Main Content -->
-        <main class="ml-64 p-6">
+        <main class="p-6">
             <!-- Header -->
-            <header class="mb-8 flex items-center justify-between">
+            <!-- <header class="mb-8 flex items-center justify-between">
                 <div class="relative w-96">
                     <SearchIcon class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                     <input type="text" placeholder="Search here..."
@@ -37,9 +36,8 @@
                         <MessageCircleIcon class="h-6 w-6 text-gray-600" />
                         <span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"></span>
                     </button>
-                    <!-- <img src="/placeholder.svg?height=40&width=40" alt="Profile" class="h-10 w-10 rounded-full" /> -->
                 </div>
-            </header>
+            </header> -->
 
             <!-- Metric Cards -->
             <div class="mb-8 grid grid-cols-4 gap-6">
@@ -109,35 +107,11 @@
                 </div>
             </div>
         </main>
-    </div>
+        <!-- </div> -->
 </template>
 
-<script setup>
-import {
-    ActivityIcon,
-    // HomeIcon, 
-    // LayersIcon, 
-    // BoxIcon,
-    // PuzzleIcon,
-    // FileTextIcon,
-    // ChartBarIcon,
-    SearchIcon,
-    BellIcon,
-    MessageCircleIcon
-} from 'lucide-vue-next';
-
-
-const menuItems = [
-    { name: 'Dashboard', active: true },
-    {
-        name: 'Income', url: '/income'
-    }
-];
-
-</script>
 
 <script>
-
 
 export default {
     // eslint-disable-next-line
@@ -223,63 +197,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.dashboard-container {
-    display: flex;
-    height: 100vh;
-}
-
-.left-panel {
-    width: 250px;
-    background-color: #f4f4f4;
-    padding: 20px;
-    border-right: 1px solid #ccc;
-}
-
-.left-panel nav ul {
-    list-style: none;
-    padding: 0;
-}
-
-.left-panel nav ul li {
-    margin: 15px 0;
-}
-
-.left-panel nav ul li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
-
-.main-content {
-    flex: 1;
-    padding: 20px;
-    background-color: #fff;
-}
-
-.summary-cards {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.card {
-    flex: 1;
-    min-width: 200px;
-    background: #f9f9f9;
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 5px;
-    text-align: center;
-}
-
-.card h2 {
-    margin-bottom: 10px;
-}
-
-.card p {
-    font-size: 1.5rem;
-    color: #333;
-    margin: 0;
-}
-</style>

@@ -1,19 +1,13 @@
 <template>
-  <div>
-    <router-view />
-  </div>
+    <LoggedInLayout v-if="store.getters.isAuthenticated">
+        <router-view></router-view>
+    </LoggedInLayout>
+    <router-view v-else></router-view>
 </template>
 
-<script>
-export default {
-  name: 'App'
-}
-</script>
+<script setup>
+import LoggedInLayout from '@/layout/LoggedInLayout.vue';
+import { useStore } from 'vuex';
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
-}
-</style>
+const store = useStore();
+</script>
