@@ -1,47 +1,47 @@
 <template>
     <div class="p-6 max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8 text-gray-800">Income Management</h1>
+        <h1 class="text-3xl font-bold mb-8 text-gray-800">Expense Management</h1>
 
-        <!-- Income Summary -->
+        <!-- Expense Summary -->
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-lg shadow-lg mb-8 text-white">
-            <h2 class="text-2xl font-semibold mb-4">Income Summary</h2>
+            <h2 class="text-2xl font-semibold mb-4">Expense Summary</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-                    <p class="text-sm uppercase">Total Income</p>
-                    <p class="text-2xl font-bold">${{ totalIncome.toFixed(2) }}</p>
+                    <p class="text-sm uppercase">Total Expense</p>
+                    <p class="text-2xl font-bold">${{ totalExpense.toFixed(2) }}</p>
                 </div>
                 <div class="bg-white bg-opacity-20 p-4 rounded-lg">
                     <p class="text-sm uppercase">Number of Entries</p>
-                    <p class="text-2xl font-bold">{{ incomes.length }}</p>
+                    <p class="text-2xl font-bold">{{ expenses.length }}</p>
                 </div>
                 <!--
         <div class="bg-white bg-opacity-20 p-4 rounded-lg">
-          <p class="text-sm uppercase">Average Income</p>
-          <p class="text-2xl font-bold">${{ averageIncome.toFixed(2) }}</p>
+          <p class="text-sm uppercase">Average Expense</p>
+          <p class="text-2xl font-bold">${{ averageExpense.toFixed(2) }}</p>
         </div>
         -->
             </div>
         </div>
 
-        <!-- Income Entry Form -->
+        <!-- Expense Entry Form -->
         <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
-            <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ isEditingIncome ? 'Edit Income' : 'Add New Income'
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ isEditingExpense ? 'Edit Expense' : 'Add New Expense'
                 }}</h2>
-            <form @submit.prevent="incomeSubmit" class="space-y-6">
+            <form @submit.prevent="expenseSubmit" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                        <input type="number" id="amount" v-model="currentIncome.amount"
-                            :class="{ 'border-red-500': v$.currentIncome.amount.$error }"
+                        <input type="number" id="amount" v-model="currentExpense.amount"
+                            :class="{ 'border-red-500': v$.currentExpense.amount.$error }"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                             placeholder="Enter amount" step="0.01">
-                        <p v-if="v$.currentIncome.amount.$error" class="mt-1 text-sm text-red-600">
-                            {{ v$.currentIncome.amount.$errors[0].$message }}
+                        <p v-if="v$.currentExpense.amount.$error" class="mt-1 text-sm text-red-600">
+                            {{ v$.currentExpense.amount.$errors[0].$message }}
                         </p>
                     </div>
                     <div>
                         <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <select id="category" v-model="currentIncome.category._id"
+                        <select id="category" v-model="currentExpense.category._id"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                             <option disabled>Select a category</option>
                             <option v-for="category in categories" :key="category._id" :value="category._id">{{
@@ -51,18 +51,18 @@
                 </div>
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <input type="text" id="description" v-model="currentIncome.description"
+                    <input type="text" id="description" v-model="currentExpense.description"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                         placeholder="Enter description">
                 </div>
                 <div>
                     <button type="submit"
                         class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                        {{ isEditingIncome ? 'Update Income' : 'Add Income' }}
+                        {{ isEditingExpense ? 'Update Expense' : 'Add Expense' }}
                     </button>
-                    <button v-if="isEditingIncome"
+                    <button v-if="isEditingExpense"
                         class="w-full mt-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        type="button" @click="resetIncomeForm">
+                        type="button" @click="resetExpenseForm">
                         Cancel
                     </button>
                 </div>
@@ -106,9 +106,9 @@
             </div>
         </div>
 
-        <!-- Income List -->
+        <!-- Expense List -->
         <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Income List</h2>
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Expense List</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -126,18 +126,18 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="income in incomes" :key="income._id" class="hover:bg-gray-50">
+                        <tr v-for="expense in expenses" :key="expense._id" class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${{
-                                income.amount.toFixed(2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ income.description }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ income.category?.name }}
+                                expense.amount.toFixed(2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ expense.description }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ expense.category?.name }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ new
-                                Date(income.date).toLocaleDateString() }}</td>
+                                Date(expense.date).toLocaleDateString() }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button @click="editIncome(income)"
+                                <button @click="editExpense(expense)"
                                     class="text-indigo-600 hover:text-indigo-900 mr-2 transition duration-150 ease-in-out">Edit</button>
-                                <button @click="deleteIncome(income._id)"
+                                <button @click="deleteExpense(expense._id)"
                                     class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">Delete</button>
                             </td>
                         </tr>
@@ -168,18 +168,18 @@ import debounce from 'lodash.debounce'
 
 export default {
     // eslint-disable-next-line
-    name: "Income",
+    name: "Expense",
     setup() {
 
         const categories = ref([]);
-        const incomes = ref([]);
-        const isEditingIncome = ref(false);
+        const expenses = ref([]);
+        const isEditingExpense = ref(false);
         const isEditingCategory = ref(false);
         const showAddCategory = ref(false);
         const error = ref('');
         const loading = ref(false);
 
-        const currentIncome = reactive({
+        const currentExpense = reactive({
             _id: null,
             amount: 0,
             category: {
@@ -197,7 +197,7 @@ export default {
 
 
         const rules = {
-            currentIncome: {
+            currentExpense: {
                 amount: { required, numeric, minValue: minValue(0.01) },
             },
             currentCategory: {
@@ -206,15 +206,15 @@ export default {
 
         };
 
-        const v$ = useVuelidate(rules, { currentIncome, currentCategory });
+        const v$ = useVuelidate(rules, { currentExpense, currentCategory });
 
 
         return {
             categories,
-            incomes,
-            currentIncome,
+            expenses,
+            currentExpense,
             currentCategory,
-            isEditingIncome,
+            isEditingExpense,
             isEditingCategory,
             showAddCategory,
             error,
@@ -226,13 +226,13 @@ export default {
     methods: {
         async fetchData() {
             try {
-                const [incomesResponse, categoriesResponse] = await Promise.all([
-                    this.$axios.get('/income'),
-                    this.$axios.get('/income/category')
+                const [expensesResponse, categoriesResponse] = await Promise.all([
+                    this.$axios.get('/expense'),
+                    this.$axios.get('/expense/category')
                 ]);
 
 
-                this.incomes = incomesResponse.data;
+                this.expenses = expensesResponse.data;
                 this.categories = categoriesResponse.data.data;
             } catch (err) {
                 this.error = 'An error occurred while fetching data. Please try again later.';
@@ -241,25 +241,25 @@ export default {
                 this.loading = false;
             }
         },
-        resetIncomeForm() {
-            Object.assign(this.currentIncome, { _id: null, amount: 0, category: {}, description: '', date: new Date().toISOString().split('T')[0] })
-            this.isEditingIncome = false
-            this.v$.currentIncome.$reset()
+        resetExpenseForm() {
+            Object.assign(this.currentExpense, { _id: null, amount: 0, category: {}, description: '', date: new Date().toISOString().split('T')[0] })
+            this.isEditingExpense = false
+            this.v$.currentExpense.$reset()
         },
-        editIncome(income) {
-            Object.assign(this.currentIncome, { ...income, category: income.category ?? {} })
-            this.isEditingIncome = true;
+        editExpense(expense) {
+            Object.assign(this.currentExpense, { ...expense, category: expense.category ?? {} })
+            this.isEditingExpense = true;
         },
 
-        incomeSubmit: debounce(async function () {
+        expenseSubmit: debounce(async function () {
             try {
-                const result = await this.v$.currentIncome.$validate()
+                const result = await this.v$.currentExpense.$validate()
                 if (!result) {
                     return
                 }
 
-                const url = this.isEditingIncome ? `/income/${this.currentIncome._id}` : '/income'
-                const method = this.isEditingIncome ? 'PUT' : 'POST'
+                const url = this.isEditingExpense ? `/expense/${this.currentExpense._id}` : '/expense'
+                const method = this.isEditingExpense ? 'PUT' : 'POST'
 
                 const response = await this.$axios({
                     url: url,
@@ -267,49 +267,49 @@ export default {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    data: this.currentIncome,
+                    data: this.currentExpense,
                 });
 
                 if (!response.data.success) {
                     throw new Error();
                 }
 
-                const savedIncome = response.data.data;
-                if (this.isEditingIncome) {
-                    const index = this.incomes.findIndex((x) => x._id == savedIncome._id);
-                    this.incomes[index] = savedIncome;
+                const savedExpense = response.data.data;
+                if (this.isEditingExpense) {
+                    const index = this.expenses.findIndex((x) => x._id == savedExpense._id);
+                    this.expenses[index] = savedExpense;
                 } else {
-                    this.incomes.push(savedIncome);
+                    this.expenses.push(savedExpense);
                 }
 
-                this.resetIncomeForm()
+                this.resetExpenseForm()
             } catch (err) {
-                this.error = 'An error occurred while saving the income. Please try again.'
-                console.error('Error saving income:', err)
+                this.error = 'An error occurred while saving the expense. Please try again.'
+                console.error('Error saving expense:', err)
 
             }
         }, 300),
 
-        async deleteIncome(id) {
+        async deleteExpense(id) {
             try {
-                await this.$axios.delete(`/income/${id}`);
-                this.incomes = this.incomes.filter(income => income._id !== id)
+                await this.$axios.delete(`/expense/${id}`);
+                this.expenses = this.expenses.filter(expense => expense._id !== id)
             } catch (err) {
-                this.error = 'An error occurred while deleting the income. Please try again.'
-                console.error('Error deleting income:', err)
+                this.error = 'An error occurred while deleting the expense. Please try again.'
+                console.error('Error deleting expense:', err)
             }
         },
 
         async addCategory() {
             if (this.currentCategory && !this.categories.some(cat => cat.name === this.currentCategory)) {
                 try {
-                    const response = await this.$axios.post('/income/category',
+                    const response = await this.$axios.post('/expense/category',
                         { name: this.currentCategory }
                     );
 
                     const savedCategory = response.data.data;
                     this.categories.push(savedCategory);
-                    this.currentIncome.category = savedCategory.category;
+                    this.currentExpense.category = savedCategory.category;
                     this.currentCategory = '';
                     this.showAddCategory = false;
                 } catch (err) {
@@ -326,7 +326,7 @@ export default {
                     return
                 }
 
-                const url = this.isEditingCategory ? `/income/category/${this.currentCategory._id}` : '/income/category'
+                const url = this.isEditingCategory ? `/expense/category/${this.currentCategory._id}` : '/expense/category'
                 const method = this.isEditingCategory ? 'PUT' : 'POST'
 
                 const response = await this.$axios({
@@ -362,7 +362,7 @@ export default {
         },
         async deleteCategory(id) {
             try {
-                await this.$axios.delete(`/income/category/${id}`);
+                await this.$axios.delete(`/expense/category/${id}`);
                 this.categories = this.categories.filter(cat => cat._id !== id);
             } catch (err) {
                 this.error = 'An error occurred while deleting the category. Please try again.'
@@ -387,8 +387,8 @@ export default {
         await this.fetchData();
     },
     computed: {
-        totalIncome() {
-            return this.incomes.reduce((sum, income) => sum + income.amount, 0)
+        totalExpense() {
+            return this.expenses.reduce((sum, expense) => sum + expense.amount, 0)
         }
     }
 }

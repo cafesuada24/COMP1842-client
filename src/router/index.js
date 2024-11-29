@@ -2,6 +2,7 @@ import { createMemoryHistory, createRouter } from 'vue-router';
 //import { useStore } from "vuex";
 import Dashboard from "@/features/dashboard/Dashboard.vue";
 import Income from "@/features/income/Income.vue";
+import Expense from "@/features/expense/Expense.vue";
 import AuthLogin from "@/features/auth/AuthLogin.vue";
 
 const routes = [
@@ -16,6 +17,12 @@ const routes = [
     path: '/income',
     name: "Income",
     component: Income,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/expense',
+    name: "Expense",
+    component: Expense,
     meta: { requiresAuth: true },
   },
   {

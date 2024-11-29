@@ -61,7 +61,7 @@ const showUserMenu = ref(false)
 const navItems = [
   { name: 'Dashboard', path: '/', icon: HomeIcon },
   { name: 'Income', path: '/income', icon: DollarSignIcon },
-  { name: 'Expenses', path: '/expenses', icon: PieChartIcon },
+  { name: 'Expense', path: '/expense', icon: PieChartIcon },
   { name: 'Settings', path: '/settings', icon: SettingsIcon },
 ]
 
