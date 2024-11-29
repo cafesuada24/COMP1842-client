@@ -3,6 +3,7 @@ import { createMemoryHistory, createRouter } from 'vue-router';
 import Dashboard from "@/features/dashboard/Dashboard.vue";
 import Income from "@/features/income/Income.vue";
 import Expense from "@/features/expense/Expense.vue";
+import SavingGoal from "@/features/saving-goal/SavingGoal.vue";
 import AuthLogin from "@/features/auth/AuthLogin.vue";
 
 const routes = [
@@ -23,6 +24,12 @@ const routes = [
     path: '/expense',
     name: "Expense",
     component: Expense,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/saving-goal',
+    name: "Saving Goal",
+    component: SavingGoal,
     meta: { requiresAuth: true },
   },
   {

@@ -62,6 +62,7 @@ const navItems = [
   { name: 'Dashboard', path: '/', icon: HomeIcon },
   { name: 'Income', path: '/income', icon: DollarSignIcon },
   { name: 'Expense', path: '/expense', icon: PieChartIcon },
+  { name: 'Saving Goal', path: '/saving-goal', icon: DollarSignIcon },
   { name: 'Settings', path: '/settings', icon: SettingsIcon },
 ]
 
