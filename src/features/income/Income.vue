@@ -1,248 +1,159 @@
 <template>
-    <div>
-        <!-- Loading state -->
-        <div v-if="loading" class="text-center py-8">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            <p class="mt-2 text-gray-600">Loading...</p>
-        </div>
+    <div class="p-6 max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-gray-800">Income Management</h1>
 
-        <!-- Error state -->
-        <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-            role="alert">
-            <strong class="font-bold">Error!</strong>
-            <span class="block sm:inline"> {{ error }}</span>
+        <!-- Income Summary -->
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-lg shadow-lg mb-8 text-white">
+            <h2 class="text-2xl font-semibold mb-4">Income Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                    <p class="text-sm uppercase">Total Income</p>
+                    <p class="text-2xl font-bold">${{ totalIncome.toFixed(2) }}</p>
+                </div>
+                <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                    <p class="text-sm uppercase">Number of Entries</p>
+                    <p class="text-2xl font-bold">{{ incomes.length }}</p>
+                </div>
+                <!--
+        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+          <p class="text-sm uppercase">Average Income</p>
+          <p class="text-2xl font-bold">${{ averageIncome.toFixed(2) }}</p>
         </div>
-
-        <div v-else>
-            <!-- Total Income Summary -->
-            <div class="mb-6 grid gap-4 sm:grid-cols-2">
-                <div class="rounded-lg bg-white p-4 shadow-md">
-                    <h2 class="mb-2 text-lg font-semibold text-gray-700">Total Income</h2>
-                    <p class="text-3xl font-bold text-indigo-600">${{ totalIncome.toFixed(2) }}</p>
-                </div>
-                <div class="rounded-lg bg-white p-4 shadow-md">
-                    <h2 class="mb-2 text-lg font-semibold text-gray-700">Total Entries</h2>
-                    <p class="text-3xl font-bold text-indigo-600">{{ incomes.length }}</p>
-                </div>
+        -->
             </div>
+        </div>
 
-            <!-- Add/Edit Income Form -->
-            <form @submit.prevent="handleSubmit" class="mb-8 rounded-lg bg-white p-6 shadow-md">
-                <h2 class="mb-4 text-xl font-semibold">{{ isEditing ? 'Edit' : 'Add' }} Income</h2>
-                <div class="mb-4 grid gap-4 md:grid-cols-2">
+        <!-- Income Entry Form -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ isEditingIncome ? 'Edit Income' : 'Add New Income'
+                }}</h2>
+            <form @submit.prevent="incomeSubmit" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="amount" class="mb-2 block text-sm font-medium text-gray-700">Amount</label>
-                        <input id="amount" v-model.number="currentIncome.amount" type="number" step="0.01" required
-                            class="w-full rounded-md border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                            :class="{ 'border-red-500': v$.currentIncome.amount.$errors.length > 0 }" />
-                        <p v-if="v$.currentIncome.amount.$errors.length" class="mt-1 text-xs text-red-500">
+                        <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                        <input type="number" id="amount" v-model="currentIncome.amount"
+                            :class="{ 'border-red-500': v$.currentIncome.amount.$error }"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            placeholder="Enter amount" step="0.01">
+                        <p v-if="v$.currentIncome.amount.$error" class="mt-1 text-sm text-red-600">
                             {{ v$.currentIncome.amount.$errors[0].$message }}
                         </p>
                     </div>
                     <div>
-                        <label for="categoryId" class="mb-2 block text-sm font-medium text-gray-700">Category</label>
-                        <div class="flex">
-                            <select id="categoryId" v-model="currentIncome.category._id"
-                                class="w-full rounded-l-md border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                                <option>Select a category</option>
-                                <option v-for="category in categories" :key="category._id" :value="category._id">
-                                    {{ category.name }}
-                                </option>
-                            </select>
-                            <button type="button" @click="showAddCategory = true"
-                                class="rounded-r-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                +
-                            </button>
-                        </div>
-                        <!-- <p v-if="v$.currentIncome.categoryId.$error" class="mt-1 text-xs text-red-500">
-                            {{ v$.currentIncome.categoryId.$errors[0].$message }}
-                        </p> -->
+                        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="category" v-model="currentIncome.category._id"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <option disabled>Select a category</option>
+                            <option v-for="category in categories" :key="category._id" :value="category._id">{{
+                                category.name }}</option>
+                        </select>
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label for="description" class="mb-2 block text-sm font-medium text-gray-700">Description</label>
-                    <textarea id="description" v-model="currentIncome.description" rows="3"
-                        class="w-full rounded-md border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"></textarea>
-                    <!-- <p v-if="v$.currentIncome.description.$error" class="mt-1 text-xs text-red-500">
-                        {{ v$.currentIncome.description.$errors[0].$message }}
-                    </p>-->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <input type="text" id="description" v-model="currentIncome.description"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        placeholder="Enter description">
                 </div>
-                <div class="flex justify-end">
+                <div>
                     <button type="submit"
-                        class="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        :disabled="v$.$invalid">
-                        {{ isEditing ? 'Update' : 'Add' }} Income
+                        class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                        {{ isEditingIncome ? 'Update Income' : 'Add Income' }}
                     </button>
                 </div>
             </form>
+        </div>
 
-            <!-- Income List -->
-            <div class="overflow-x-auto rounded-lg bg-white shadow-md">
-                <div class="p-4 flex justify-between items-center">
+        <!-- Category Management -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Manage Categories</h2>
+            <div class="space-y-4">
+                <div v-for="category in categories" :key="category._id"
+                    class="flex items-center justify-between bg-gray-50 p-3 rounded-md">
+                    <span class="font-medium text-gray-700">{{ category.name }}</span>
                     <div>
-                        <label for="sort" class="mr-2">Sort by:</label>
-                        <select id="sort" v-model="sortBy" class="rounded-md border border-gray-300 p-1">
-                            <option value="date">Date</option>
-                            <option value="amount">Amount</option>
-                            <option value="categoryId">Category</option>
-                        </select>
-                    </div>
-                    <div>
-                        <button @click="toggleSortOrder" class="ml-2 p-1 rounded-md bg-gray-200">
-                            {{ sortOrder === 'asc' ? '↑' : '↓' }}
-                        </button>
+                        <button @click="editCategory(category)"
+                            class="text-blue-600 hover:text-blue-800 mr-2 transition duration-150 ease-in-out">Edit</button>
+                        <button @click="deleteCategory(category._id)"
+                            class="text-red-600 hover:text-red-800 transition duration-150 ease-in-out">Delete</button>
                     </div>
                 </div>
-                <table class="w-full table-auto">
+                <form @submit.prevent="categorySubmit" class="mt-6">
+                    <div class="flex items-center">
+                        <input type="text" v-model="currentCategory.name"
+                            :placeholder="isEditingCategory ? 'Edit category name' : 'New category name'"
+                            :class="{ 'border-red-500': v$.currentCategory.$error }"
+                            class="flex-grow rounded-l-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-r-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
+                            {{ isEditingCategory ? 'Update' : 'Add' }} Category
+                        </button>
+                    </div>
+                    <p v-if="v$.currentCategory.$error" class="mt-1 text-sm text-red-600">
+                        {{ v$.currentCategory.$errors[0].$message }}
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Income List -->
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Income List</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Amount</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                Category</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Description</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Category</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        <tr v-for="income in incomes" :key="income._id">
-                            <td class="whitespace-nowrap px-6 py-4">${{ income.amount.toFixed(2) }}</td>
-                            <td class="whitespace-nowrap px-6 py-4">{{ income.category?.name }}</td>
-                            <td class="px-6 py-4">{{ income.description }}</td>
-                            <td class="whitespace-nowrap px-6 py-4">{{ formatDate(income.date) }}</td>
-                            <td class="whitespace-nowrap px-6 py-4">
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-for="income in incomes" :key="income._id" class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${{
+                                income.amount.toFixed(2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ income.description }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ income.category?.name }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ new
+                                Date(income.date).toLocaleDateString() }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button @click="editIncome(income)"
-                                    class="mr-2 text-indigo-600 hover:text-indigo-900 focus:outline-none">
-                                    Edit
-                                </button>
+                                    class="text-indigo-600 hover:text-indigo-900 mr-2 transition duration-150 ease-in-out">Edit</button>
                                 <button @click="deleteIncome(income._id)"
-                                    class="text-red-600 hover:text-red-900 focus:outline-none">
-                                    Delete
-                                </button>
+                                    class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">Delete</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <div class="p-4 flex justify-between items-center">
-                    <button @click="prevPage" :disabled="currentPage === 1"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md disabled:opacity-50">
-                        Previous
-                    </button>
-                    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-                    <button @click="nextPage" :disabled="currentPage === totalPages"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md disabled:opacity-50">
-                        Next
-                    </button>
-                </div>
             </div>
+        </div>
 
-            <!-- Add Category Modal -->
-            <div v-if="showAddCategory" class="fixed inset-0 z-10 overflow-y-auto" aria-labelledby="modal-title"
-                role="dialog" aria-modal="true">
-                <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                    <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
-                    <div
-                        class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
-                        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                            <div class="sm:flex sm:items-start">
-                                <div class="mt-3 w-full text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                    <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">Add New
-                                        Category</h3>
-                                    <div class="mt-2">
-                                        <input v-model="newCategory" type="text" placeholder="Enter new category"
-                                            class="w-full rounded-md border border-gray-300 p-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                            <button type="button" @click="addCategory"
-                                class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">
-                                Add
-                            </button>
-                            <button type="button" @click="showAddCategory = false"
-                                class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto sm:text-sm">
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
+        <!-- Toast Notifications -->
+        <div class="fixed bottom-5 right-5 z-50">
+            <transition-group name="fade">
+                <!-- eslint-disable-next-line -->
+                <div v-for="(toast, index) in toasts" :key="toast.id" class="mb-2 p-4 rounded-md shadow-lg text-white"
+                    :class="toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'">
+                    {{ toast.message }}
                 </div>
-            </div>
+            </transition-group>
         </div>
     </div>
 </template>
 
-<!-- <script setup>
-import { ref, reactive, computed } from 'vue'
-
-const incomes = ref([
-  { id: 1, amount: 5000, category: 'Salary', description: 'Monthly salary' },
-  { id: 2, amount: 1000, category: 'Freelance', description: 'Web development project' },
-])
-
-const currentIncome = reactive({
-  id: null,
-  amount: 0,
-  category: '',
-  description: '',
-})
-
-const isEditing = ref(false)
-const showAddCategory = ref(false)
-const newCategory = ref('')
-
-const categories = ref(['Salary', 'Freelance', 'Investments', 'Other'])
-
-const totalIncome = computed(() => {
-  return incomes.value.reduce((sum, income) => sum + income.amount, 0)
-})
-
-const handleSubmit = () => {
-  if (isEditing.value) {
-    const index = incomes.value.findIndex(income => income.id === currentIncome.id)
-    if (index !== -1) {
-      incomes.value[index] = { ...currentIncome }
-    }
-  } else {
-    const newId = Math.max(0, ...incomes.value.map(i => i.id)) + 1
-    incomes.value.push({ ...currentIncome, id: newId })
-  }
-  resetForm()
-}
-
-const editIncome = (income) => {
-  Object.assign(currentIncome, income)
-  isEditing.value = true
-}
-
-const deleteIncome = (id) => {
-  incomes.value = incomes.value.filter(income => income.id !== id)
-}
-
-const resetForm = () => {
-  Object.assign(currentIncome, { id: null, amount: 0, category: '', description: '' })
-  isEditing.value = false
-}
-
-const addCategory = () => {
-  if (newCategory.value && !categories.value.includes(newCategory.value)) {
-    categories.value.push(newCategory.value)
-    currentIncome.category = newCategory.value
-    newCategory.value = ''
-    showAddCategory.value = false
-  }
-}
-</script> -->
 <script>
 
 import { ref, reactive } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
-import { required, minValue } from '@vuelidate/validators'
+import { required, minValue, numeric } from '@vuelidate/validators'
 import debounce from 'lodash.debounce'
 
 export default {
@@ -252,9 +163,9 @@ export default {
 
         const categories = ref([]);
         const incomes = ref([]);
-        const isEditing = ref(false);
+        const isEditingIncome = ref(false);
+        const isEditingCategory = ref(false);
         const showAddCategory = ref(false);
-        const newCategory = ref('');
         const error = ref('');
         const loading = ref(false);
 
@@ -269,23 +180,33 @@ export default {
             date: new Date().toISOString().split('T')[0],
         });
 
+        const currentCategory = reactive({
+            _id: null,
+            name: null,
+        });
+
 
         const rules = {
             currentIncome: {
-                amount: { required, minValue: minValue(0.01) },
+                amount: { required, numeric, minValue: minValue(0.01) },
             },
+            currentCategory: {
+                name: { required }
+            }
+
         };
 
-        const v$ = useVuelidate(rules, { currentIncome });
+        const v$ = useVuelidate(rules, { currentIncome, currentCategory });
 
 
         return {
             categories,
             incomes,
             currentIncome,
-            isEditing,
+            currentCategory,
+            isEditingIncome,
+            isEditingCategory,
             showAddCategory,
-            newCategory,
             error,
             loading,
             v$
@@ -310,20 +231,25 @@ export default {
                 this.loading = false;
             }
         },
-        resetForm() {
-            Object.assign(this.currentIncome, { id: null, amount: 0, category: {}, description: '', date: new Date().toISOString().split('T')[0] })
-            this.isEditing = false
-            this.v$.$reset()
+        resetIncomeForm() {
+            Object.assign(this.currentIncome, { _id: null, amount: 0, category: {}, description: '', date: new Date().toISOString().split('T')[0] })
+            this.isEditingIncome = false
+            this.v$.currentIncome.$reset()
         },
-        handleSubmit: debounce(async function () {
+        editIncome(income) {
+            Object.assign(this.currentIncome, { ...income, category: income.category ?? {}})
+            this.isEditingIncome = true;
+        },
+
+        incomeSubmit: debounce(async function () {
             try {
-                const result = await this.v$.$validate()
+                const result = await this.v$.currentIncome.$validate()
                 if (!result) {
                     return
                 }
 
-                const url = this.isEditing ? `/income/${this.currentIncome._id}` : '/income'
-                const method = this.isEditing ? 'PUT' : 'POST'
+                const url = this.isEditingIncome ? `/income/${this.currentIncome._id}` : '/income'
+                const method = this.isEditingIncome ? 'PUT' : 'POST'
 
                 const response = await this.$axios({
                     url: url,
@@ -334,22 +260,26 @@ export default {
                     data: this.currentIncome,
                 });
 
+                if (!response.data.success) {
+                    throw new Error();
+                }
+
                 const savedIncome = response.data.data;
-                if (this.isEditing) {
+                if (this.isEditingIncome) {
                     const index = this.incomes.findIndex((x) => x._id == savedIncome._id);
                     this.incomes[index] = savedIncome;
                 } else {
                     this.incomes.push(savedIncome);
                 }
 
-
-                this.resetForm()
+                this.resetIncomeForm()
             } catch (err) {
                 this.error = 'An error occurred while saving the income. Please try again.'
                 console.error('Error saving income:', err)
 
             }
         }, 300),
+
         async deleteIncome(id) {
             try {
                 await this.$axios.delete(`/income/${id}`);
@@ -360,21 +290,17 @@ export default {
             }
         },
 
-        formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' }
-            return new Date(dateString).toLocaleDateString(undefined, options)
-        },
         async addCategory() {
-            if (this.newCategory && !this.categories.some(cat => cat.name === this.newCategory)) {
+            if (this.currentCategory && !this.categories.some(cat => cat.name === this.currentCategory)) {
                 try {
                     const response = await this.$axios.post('/income/category',
-                        { name: this.newCategory }
+                        { name: this.currentCategory }
                     );
 
                     const savedCategory = response.data.data;
                     this.categories.push(savedCategory);
                     this.currentIncome.category = savedCategory.category;
-                    this.newCategory = '';
+                    this.currentCategory = '';
                     this.showAddCategory = false;
                 } catch (err) {
                     this.error = 'An error occurred while adding the category. Please try again.'
@@ -382,10 +308,68 @@ export default {
                 }
             }
         },
-        async editIncome(income) {
-            Object.assign(this.currentIncome, income)
-            this.isEditing = true;
-        }
+
+        categorySubmit: debounce(async function () {
+            try {
+                const result = await this.v$.currentCategory.$validate()
+                if (!result) {
+                    return
+                }
+
+                const url = this.isEditingCategory ? `/income/category/${this.currentCategory._id}` : '/income/category'
+                const method = this.isEditingCategory ? 'PUT' : 'POST'
+
+                const response = await this.$axios({
+                    url: url,
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    data: this.currentCategory,
+                });
+                if (!response.data.success) {
+                    throw new Error();
+                }
+                const savedCategory = response.data.data;
+                if (this.isEditingCategory) {
+                    const index = this.categories.findIndex(x => x._id == savedCategory._id);
+                    if (index !== -1) {
+                        this.categories[index] = savedCategory;
+                    }
+                } else {
+                    this.categories.push(savedCategory);
+                }
+                this.resetCategoryForm();
+            } catch(error) {
+                this.error = 'An error occurred while saving the category. Please try again.';
+                console.error('Error saving category:', error)
+            }
+
+        }, 300),
+        editCategory(category) {
+            Object.assign(this.currentCategory, category)
+            this.isEditingCategory = true;
+        },
+        async deleteCategory(id) {
+            try {
+                await this.$axios.delete(`/income/category/${id}`);
+                this.categories = this.categories.filter(cat => cat._id !== id);
+            } catch (err) {
+                this.error = 'An error occurred while deleting the category. Please try again.'
+                console.error('Error deleting category:', err)
+            }
+        },
+        resetCategoryForm() {
+            Object.assign(this.currentCategory, { _id: null, name: null });
+            this.isEditingCategory = false;
+            this.v$.currentCategory.$reset();
+        },
+
+        formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' }
+            return new Date(dateString).toLocaleDateString(undefined, options)
+        },
+
     },
 
 
@@ -399,3 +383,15 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+</style>
