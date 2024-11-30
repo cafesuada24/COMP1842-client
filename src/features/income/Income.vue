@@ -1,10 +1,15 @@
 <template>
     <div class="p-6 max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8 text-gray-800">Income Management</h1>
-
+        <div class="flex flex-row w-full justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Income Management</h1>
+            <button @click="gotoIncomeReport"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                View Report
+            </button>
+        </div>
         <!-- Income Summary -->
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-lg shadow-lg mb-8 text-white">
-            <h2 class="text-2xl font-semibold mb-4">Income Summary</h2>
+            <h2 class="text-2xl font-semibold mb-4">Income Summary </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white bg-opacity-20 p-4 rounded-lg">
                     <p class="text-sm uppercase">Total Income</p>
@@ -54,6 +59,18 @@
                     <input type="text" id="description" v-model="currentIncome.description"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                         placeholder="Enter description">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="deadline">
+                       Date 
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        :class="{ 'border-red-500': v$.currentIncome.date.$error }" id="date" type="date"
+                        v-model="currentIncome.date" @blur="v$.currentIncome.date.$touch()">
+                    <div v-if="v$.currentIncome.date.$error" class="text-red-500 text-xs italic mt-1">
+                        {{ v$.currentIncome.date.$errors[0].$message }}
+                    </div>
                 </div>
                 <div>
                     <button type="submit"
@@ -132,8 +149,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ income.description }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ income.category?.name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ new
-                                Date(income.date).toLocaleDateString() }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(income.date) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button @click="editIncome(income)"
                                     class="text-indigo-600 hover:text-indigo-900 mr-2 transition duration-150 ease-in-out">Edit</button>
@@ -165,6 +181,7 @@ import { ref, reactive } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minValue, numeric } from '@vuelidate/validators'
 import debounce from 'lodash.debounce'
+import { useRouter } from 'vue-router';
 
 export default {
     // eslint-disable-next-line
@@ -178,6 +195,7 @@ export default {
         const showAddCategory = ref(false);
         const error = ref('');
         const loading = ref(false);
+        const router = useRouter();
 
         const currentIncome = reactive({
             _id: null,
@@ -199,6 +217,7 @@ export default {
         const rules = {
             currentIncome: {
                 amount: { required, numeric, minValue: minValue(0.01) },
+                date: { required }
             },
             currentCategory: {
                 name: { required }
@@ -219,7 +238,8 @@ export default {
             showAddCategory,
             error,
             loading,
-            v$
+            v$,
+            router,
         };
 
     },
@@ -247,7 +267,7 @@ export default {
             this.v$.currentIncome.$reset()
         },
         editIncome(income) {
-            Object.assign(this.currentIncome, { ...income, category: income.category ?? {} })
+            Object.assign(this.currentIncome, { ...income, category: income.category ?? {}, date: income.date.split('T')[0] })
             this.isEditingIncome = true;
         },
 
@@ -380,6 +400,9 @@ export default {
             return new Date(dateString).toLocaleDateString(undefined, options)
         },
 
+        gotoIncomeReport() {
+            this.router.push('/income/report');
+        }
     },
 
 

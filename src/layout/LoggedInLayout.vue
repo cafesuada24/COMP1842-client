@@ -50,11 +50,11 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { HomeIcon, DollarSignIcon, PieChartIcon, SettingsIcon, BellIcon } from 'lucide-vue-next'
+import { HomeIcon, DollarSignIcon, PieChartIcon, BellIcon } from 'lucide-vue-next'
 
-const route = useRoute()
-const router = useRouter()
-const store = useStore()
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
 
 const showUserMenu = ref(false)
 
@@ -63,12 +63,11 @@ const navItems = [
   { name: 'Income', path: '/income', icon: DollarSignIcon },
   { name: 'Expense', path: '/expense', icon: PieChartIcon },
   { name: 'Saving Goal', path: '/saving-goal', icon: DollarSignIcon },
-  { name: 'Settings', path: '/settings', icon: SettingsIcon },
 ]
 
 const pageTitle = computed(() => {
   const currentRoute = navItems.find(item => item.path === route.path)
-  return currentRoute ? currentRoute.name : 'Page Not Found'
+  return currentRoute ? currentRoute.name : route.name;
 })
 
 const toggleUserMenu = () => {

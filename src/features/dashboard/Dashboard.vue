@@ -1,199 +1,300 @@
 <template>
-     <!-- <div class="min-h-screen bg-gray-50">
-        <aside class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg">
-            <div class="p-6">
-                <div class="flex items-center gap-2 text-xl font-semibold text-indigo-600">
-                    <ActivityIcon class="h-6 w-6" />
-                    <span>Finance</span>
-                </div>
+  <!-- Main Content -->
+  <main class="p-6">
+    <!-- Metric Cards -->
+    <div class="mb-8 grid grid-cols-4 gap-6">
+      <div v-for="(metric, index) in metrics" :key="index" class="rounded-xl p-6 text-white" :class="metric.bgClass">
+        <h3 class="mb-4 text-lg font-medium">{{ metric.title }}</h3>
+        <div class="mb-2 text-3xl font-bold">{{metric.prefix}}{{ metric.value.toLocaleString() }}</div>
+        <div class="text-sm opacity-90">{{ metric.sub }} {{ metric.subValue }}</div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- AP and AR Balance Chart -->
+      <div class="lg:col-span-2 bg-white rounded-lg p-6 shadow-sm">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h3 class="text-lg font-medium text-gray-800">Monthly Balance ($)</h3>
+            <p class="text-sm text-purple-500">Avg. {{ balance.avg }}$</p>
+          </div>
+        </div>
+        <canvas ref="apArChart"></canvas>
+      </div>
+
+      <!-- Budget Progress Charts -->
+      <div class="grid grid-rows-1 gap-6">
+        <!-- Expenses Budget -->
+        <div class="bg-white rounded-lg p-6 shadow-sm">
+          <h3 class="text-lg font-medium text-gray-800 mb-4">% of Completion of Goals</h3>
+          <div class="relative">
+            <canvas ref="goalChart"></canvas>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+              <p class="text-2xl font-bold">{{ goal.percentComplete }}%</p>
+              <p class="text-sm text-gray-500">Completed</p>
             </div>
-
-            <nav class="px-4 py-2">
-                <button v-for="(item, index) in menuItems" :key="index"
-                    class="mb-1 flex items-center gap-3 rounded-lg px-4 py-2.5 text-gray-600 hover:bg-gray-100"
-                    :class="{ 'bg-gray-100': item.active }" @click="handleRedirect(item)">
-                    <component :is="item.icon" class="h-5 w-5" />
-                    <span>{{ item.name }}</span>
-                </button>
-            </nav>
-        </aside> -->
-
-        <!-- Main Content -->
-        <main class="p-6">
-            <!-- Header -->
-            <!-- <header class="mb-8 flex items-center justify-between">
-                <div class="relative w-96">
-                    <SearchIcon class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="Search here..."
-                        class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 focus:border-indigo-500 focus:outline-none">
-                </div>
-                <div class="flex items-center gap-4">
-                    <button class="relative rounded-full p-2 hover:bg-gray-100">
-                        <BellIcon class="h-6 w-6 text-gray-600" />
-                        <span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"></span>
-                    </button>
-                    <button class="relative rounded-full p-2 hover:bg-gray-100">
-                        <MessageCircleIcon class="h-6 w-6 text-gray-600" />
-                        <span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"></span>
-                    </button>
-                </div>
-            </header> -->
-
-            <!-- Metric Cards -->
-            <div class="mb-8 grid grid-cols-4 gap-6">
-                <div v-for="(metric, index) in metrics" :key="index" class="rounded-xl p-6 text-white"
-                    :class="metric.bgClass">
-                    <h3 class="mb-4 text-lg font-medium">{{ metric.title }}</h3>
-                    <div class="mb-2 text-3xl font-bold">${{ metric.value.toLocaleString() }}</div>
-                    <div class="text-sm opacity-90">{{ metric.sub }} {{ metric.subValue }}</div>
-                </div>
+          </div>
+          <div class="mt-4 flex justify-between items-center text-sm">
+            <div>
+              <p class="text-gray-600">Fail or Incompleted</p>
+              <p class="font-medium">{{ goal.failOrIncompleteCount }}</p>
             </div>
-
-            <!-- Charts Section -->
-            <div class="grid grid-cols-12 gap-6">
-                <!-- AP and AR Balance Chart -->
-                <div class="col-span-8 rounded-xl bg-white p-6 shadow-sm">
-                    <div class="mb-6 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-800">AP and AR Balance</h3>
-                            <p class="text-sm text-gray-500">Avg. $5,309</p>
-                        </div>
-                        <div class="flex gap-4">
-                            <select class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm">
-                                <option>Monthly</option>
-                            </select>
-                            <select class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm">
-                                <option>Last Year</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- Chart placeholder -->
-                    <div class="h-64 w-full bg-gray-50"></div>
-                </div>
-
-                <!-- Budget Charts -->
-                <div class="col-span-2 rounded-xl bg-white p-6 shadow-sm">
-                    <h3 class="mb-4 text-lg font-medium text-gray-800">% of Income Budget</h3>
-                    <div class="relative mb-4 h-40 w-40 mx-auto">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-gray-800">48%</div>
-                                <div class="text-sm text-gray-500">Profit</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="text-gray-600">Balance</div>
-                        <div class="font-medium text-gray-800">$18,570</div>
-                    </div>
-                    <a href="#" class="mt-4 block text-center text-sm text-blue-600">View Full Report</a>
-                </div>
-
-                <div class="col-span-2 rounded-xl bg-white p-6 shadow-sm">
-                    <h3 class="mb-4 text-lg font-medium text-gray-800">% of Expenses Budget</h3>
-                    <div class="relative mb-4 h-40 w-40 mx-auto">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-gray-800">67%</div>
-                                <div class="text-sm text-gray-500">Profit</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="text-gray-600">Balance</div>
-                        <div class="font-medium text-gray-800">$18,570</div>
-                    </div>
-                    <a href="#" class="mt-4 block text-center text-sm text-blue-600">View Full Report</a>
-                </div>
+            <div>
+              <p class="text-cyan-600">Completed</p>
+              <p class="font-medium">{{ goal.completeCount }}</p>
             </div>
-        </main>
-        <!-- </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- </div> -->
 </template>
 
 
 <script>
+import { ref } from 'vue';
+import Chart from 'chart.js/auto';
 
 export default {
-    // eslint-disable-next-line
-    name: "Dashboard",
-    setup() {
+  // eslint-disable-next-line
+  name: "Dashboard",
+  setup() {
+    const timeframe = ref('monthly')
+    const compareWith = ref('lastYear')
+    const apArChart = ref(null)
+    const incomeChart = ref(null)
+    const goalChart = ref(null)
+    const isDataReady = ref(false);
+    const incomes = ref([]);
+    const expenses = ref([]);
+    const goals = ref([]);
+    const balance = ref({ avg: 0 });
+    const goal = ref({
+      percentComplete: 0,
+      completeCount: 0,
+      failOrIncompleteCount: 0,
+    });
+    const dashboardData = ref({
+      balance: 0,
+      activeSavingGoal: 0,
+      income: {
+        count: 0,
+        totalAmount: 0
+      },
+      expense: {
+        count: 0,
+        totalAmount: 0
+      }
+    });
+    const metrics = ref([
+      {
+        title: 'Total Income',
+        prefix: '$',
+        value: 0,
+        sub: 'Count',
+        subValue: 0,
+        bgClass: 'bg-gradient-to-r from-indigo-600 to-indigo-500'
+      },
+      {
+        title: 'Total Expences',
+        prefix: '$',
+        value: 0,
+        sub: 'Count',
+        subValue: 0,
+        bgClass: 'bg-gradient-to-r from-blue-500 to-blue-400'
+      },
+      {
+        title: 'Balance',
+        prefix: '$',
+        value: 0,
+        sub: '',
+        subValue: null,
+        bgClass: 'bg-gradient-to-r from-purple-600 to-purple-500'
+      },
+      {
+        title: 'Active Savings Goals',
+        prefix: '',
+        value: 0,
+        sub: '',
+        subValue: null,
+        bgClass: 'bg-gradient-to-r from-emerald-500 to-emerald-400'
+      },
+    ]
+    );
 
+    return {
+      timeframe,
+      compareWith,
+      apArChart,
+      incomeChart,
+      goalChart,
+      isDataReady,
+      incomes,
+      expenses,
+      dashboardData,
+      metrics,
+      goals,
+      goal,
+      balance,
+    };
+  },
+  methods: {
+    syncMetrics() {
+      this.metrics[0].value = this.dashboardData.income.totalAmount;
+      this.metrics[0].subValue = this.dashboardData.income.count;
+      this.metrics[1].value = this.dashboardData.expense.totalAmount;
+      this.metrics[1].subValue = this.dashboardData.expense.count;
+      this.metrics[2].value = this.dashboardData.balance;
+      this.metrics[3].value = this.dashboardData.activeSavingGoal;
+      return this.metrics;
     },
-    data() {
-        return {
-            dashboardData: {
-                balance: 0,
-                activeSavingGoal: 0,
-                income: {
-                    count: 0,
-                    totalAmount: 0
-                },
-                expense: {
-                    count: 0,
-                    totalAmount: 0
-                }
-            },
-            metrics: [
-                {
-                    title: 'Total Income',
-                    value: 0,
-                    sub: 'Count',
-                    subValue: 0,
-                    bgClass: 'bg-gradient-to-r from-indigo-600 to-indigo-500'
-                },
-                {
-                    title: 'Total Expences',
-                    value: 0,
-                    sub: 'Count',
-                    subValue: 0,
-                    bgClass: 'bg-gradient-to-r from-blue-500 to-blue-400'
-                },
-                {
-                    title: 'Balance',
-                    value: 0,
-                    sub: '',
-                    subValue: null,
-                    bgClass: 'bg-gradient-to-r from-purple-600 to-purple-500'
-                },
-                {
-                    title: 'Active Saving Goal',
-                    value: 0,
-                    sub: '',
-                    subValue: null,
-                    bgClass: 'bg-gradient-to-r from-emerald-500 to-emerald-400'
-                },
-            ]
-        };
+    async fetchDashboardData() {
+      try {
+        const [dashboardResponse, incomeResponse, expenseResponse, goalResponse] = await Promise.all([
+          this.$axios.get(`/dashboard`),
+          this.$axios.get(`/income`),
+          this.$axios.get(`/expense`),
+          this.$axios.get('/saving-goal'),
+        ]);
+        this.dashboardData = dashboardResponse.data.dashboardData;
+        this.incomes = incomeResponse.data;
+        this.expenses = expenseResponse.data;
+        this.goals = goalResponse.data;
+        this.syncMetrics();
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
     },
-    methods: {
-        syncMetrics() {
-            this.metrics[0].value = this.dashboardData.income.totalAmount;
-            this.metrics[0].subValue = this.dashboardData.income.count;
-            this.metrics[1].value = this.dashboardData.expense.totalAmount;
-            this.metrics[1].subValue = this.dashboardData.expense.count;
-            this.metrics[2].value = this.dashboardData.balance;
-            this.metrics[3].value = this.dashboardData.activeSavingGoal;
-            return this.metrics;
-        },
-        async fetchDashboardData() {
-            try {
-                const response = await this.$axios.get(`/dashboard`);
-                this.dashboardData = response.data.dashboardData;
-                this.syncMetrics();
-            } catch (error) {
-                console.error("Error fetching dashboard data:", error);
-            }
-        },
-        handleRedirect(item) {
-            console.log(item.url);
-            if (item.url) {
-                this.$router.push(item.url);
-            }
+    handleRedirect(item) {
+      console.log(item.url);
+      if (item.url) {
+        this.$router.push(item.url);
+      }
+    },
+    getBalanceData() {
+      const currentYear = new Date().getFullYear();
+      const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      const monthlyTotals = months.reduce((acc, month) => {
+        acc[month] = 0;
+        return acc;
+      }, {});
+
+      this.incomes.forEach(({ amount, date }) => {
+        const parsedDate = new Date(date);
+
+        if (parsedDate.getFullYear() === currentYear) {
+          const month = months[parsedDate.getMonth()];
+          monthlyTotals[month] += amount;
         }
+      });
+
+      this.expenses.forEach(({ amount, date }) => {
+        const parsedDate = new Date(date);
+
+        if (parsedDate.getFullYear() === currentYear) {
+          const month = months[parsedDate.getMonth()];
+          monthlyTotals[month] -= amount;
+        }
+      });
+      this.balance.avg = Object.keys(monthlyTotals).reduce(
+        (prev, curr) => prev + monthlyTotals[curr], 0) / months.length;
+
+      return monthlyTotals;
     },
-    async created() {
-        await this.fetchDashboardData();
-    },
+    calcGoalData() {
+      const completedGoals = this.goals.reduce((sum, cur) => sum + cur.status === 'achieved' ? 0 : 1, 0);
+      this.goal.percentComplete = completedGoals / this.goals.length * 100;
+      this.goal.completeCount = completedGoals;
+      this.goal.failOrIncompleteCount = this.goals.length - completedGoals;
+    }
+  },
+  async mounted() {
+    this.$watch(
+      () => this.isDataReady,
+      () => {
+        const balanceData = this.getBalanceData();
+        this.calcGoalData();
+        new Chart(this.apArChart, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(balanceData),
+            datasets: [
+              {
+                type: 'bar',
+                label: 'Balance',
+                data: Object.values(balanceData),
+                backgroundColor: 'rgba(147, 197, 253, 0.5)',
+                borderColor: 'rgba(147, 197, 253, 1)',
+                borderWidth: 1
+              },
+              {
+                type: 'line',
+                label: 'Trend',
+                data: Object.values(balanceData),
+                borderColor: 'rgba(147, 197, 253, 1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)'
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          }
+        })
+
+        new Chart(this.goalChart, {
+          type: 'doughnut',
+          data: {
+            labels: ['Achieved', 'Failed or Incompleted'],
+            datasets: [{
+              data: [this.goal.percentComplete, 100 - this.goal.percentComplete],
+              backgroundColor: [
+                'rgba(6, 182, 212, 0.6)',
+                'rgba(229, 231, 235, 0.5)'
+              ],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            cutout: '75%',
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          }
+        })
+      }
+    );
+  },
+  async created() {
+    await this.fetchDashboardData();
+    this.isDataReady = true;
+  },
 };
 </script>
-

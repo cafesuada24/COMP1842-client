@@ -1,6 +1,12 @@
 <template>
     <div class="p-6 max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8 text-gray-800">Expense Management</h1>
+        <div class="flex flex-row w-full justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Expense Management</h1>
+            <button @click="gotoExpenseReport"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                View Report
+            </button>
+        </div>
 
         <!-- Expense Summary -->
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-lg shadow-lg mb-8 text-white">
@@ -25,7 +31,8 @@
 
         <!-- Expense Entry Form -->
         <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
-            <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ isEditingExpense ? 'Edit Expense' : 'Add New Expense'
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">
+                {{ isEditingExpense ? 'Edit Expense' : 'Add New Expense'
                 }}</h2>
             <form @submit.prevent="expenseSubmit" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -54,6 +61,18 @@
                     <input type="text" id="description" v-model="currentExpense.description"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                         placeholder="Enter description">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="deadline">
+                        Date
+                    </label>
+                    <input
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        :class="{ 'border-red-500': v$.currentExpense.date.$error }" id="date" type="date"
+                        v-model="currentExpense.date" @blur="v$.currentExpense.date.$touch()">
+                    <div v-if="v$.currentExpense.date.$error" class="text-red-500 text-xs italic mt-1">
+                        {{ v$.currentExpense.date.$errors[0].$message }}
+                    </div>
                 </div>
                 <div>
                     <button type="submit"
@@ -132,8 +151,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ expense.description }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ expense.category?.name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ new
-                                Date(expense.date).toLocaleDateString() }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(expense.date) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button @click="editExpense(expense)"
                                     class="text-indigo-600 hover:text-indigo-900 mr-2 transition duration-150 ease-in-out">Edit</button>
@@ -165,6 +183,7 @@ import { ref, reactive } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minValue, numeric } from '@vuelidate/validators'
 import debounce from 'lodash.debounce'
+import { useRouter } from 'vue-router';
 
 export default {
     // eslint-disable-next-line
@@ -178,6 +197,7 @@ export default {
         const showAddCategory = ref(false);
         const error = ref('');
         const loading = ref(false);
+        const router = useRouter();
 
         const currentExpense = reactive({
             _id: null,
@@ -199,6 +219,7 @@ export default {
         const rules = {
             currentExpense: {
                 amount: { required, numeric, minValue: minValue(0.01) },
+                date: { required }
             },
             currentCategory: {
                 name: { required }
@@ -219,7 +240,8 @@ export default {
             showAddCategory,
             error,
             loading,
-            v$
+            v$,
+            router
         };
 
     },
@@ -247,7 +269,7 @@ export default {
             this.v$.currentExpense.$reset()
         },
         editExpense(expense) {
-            Object.assign(this.currentExpense, { ...expense, category: expense.category ?? {} })
+            Object.assign(this.currentExpense, { ...expense, category: expense.category ?? {}, date: expense.date.split('T')[0] })
             this.isEditingExpense = true;
         },
 
@@ -370,14 +392,18 @@ export default {
             }
         },
         resetCategoryForm() {
-            Object.assign(this.currentCategory, { _id: null, name: null });
+            Object.assign(this.currentCategory, { _id: null, name: null, date: new Date().toISOString().split('T')[0] });
             this.isEditingCategory = false;
             this.v$.currentCategory.$reset();
         },
 
+        gotoExpenseReport() {
+            this.router.push('/expense/report');
+        },
+
         formatDate(dateString) {
             const options = { year: 'numeric', month: 'long', day: 'numeric' }
-            return new Date(dateString).toLocaleDateString(undefined, options)
+            return new Date(dateString.split('T')[0]).toLocaleDateString(undefined, options)
         },
 
     },

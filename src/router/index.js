@@ -2,12 +2,14 @@ import { createMemoryHistory, createRouter } from 'vue-router';
 //import { useStore } from "vuex";
 import Dashboard from "@/features/dashboard/Dashboard.vue";
 import Income from "@/features/income/Income.vue";
+import IncomeReport from "@/features/income/IncomeReport.vue";
 import Expense from "@/features/expense/Expense.vue";
+import ExpenseReport from "@/features/expense/ExpenseReport.vue";
 import SavingGoal from "@/features/saving-goal/SavingGoal.vue";
+import SavingGoalReport from "@/features/saving-goal/SavingGoalReport.vue";
 import AuthLogin from "@/features/auth/AuthLogin.vue";
 
 const routes = [
-  //{ path: "/", redirect: "/dashboard" },
   {
     path: "/",
     name: "Dashboard",
@@ -21,15 +23,33 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/income/report',
+    name: "Income Report",
+    component: IncomeReport,
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/expense',
     name: "Expense",
     component: Expense,
     meta: { requiresAuth: true },
   },
   {
+    path: '/expense/report',
+    name: "Expense Report",
+    component: ExpenseReport,
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/saving-goal',
     name: "Saving Goal",
     component: SavingGoal,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/saving-goal/report',
+    name: "Saving Goal Report",
+    component: SavingGoalReport,
     meta: { requiresAuth: true },
   },
   {
